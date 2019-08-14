@@ -9,7 +9,7 @@ import java.util.Arrays;
  * Created by muni on 2019/8/14
  */
 public class SparkMain {
-    public static void main (String[] args) {
+    public static void main(String[] args) {
         SparkSession spark = SparkSession.builder()
                 .config("spark.master", "local")
                 .appName("Simple Application").getOrCreate();
