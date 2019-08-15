@@ -24,7 +24,7 @@ public class MyLauncher {
             SparkAppHandle handler = launcher.startApplication(new SparkAppHandle.Listener() {
                 @Override
                 public void stateChanged(SparkAppHandle sparkAppHandle) {
-                    System.out.println(sparkAppHandle.getAppId() + " -> state changed: " + sparkAppHandle.getState().toString());
+                    System.out.println(sparkAppHandle.getAppId() + " -> state changed: " + sparkAppHandle.getState());
                 }
 
                 @Override
@@ -34,10 +34,12 @@ public class MyLauncher {
             });
 
 
-            while (handler.getState() != SparkAppHandle.State.FAILED
-                    && handler.getState() != SparkAppHandle.State.FINISHED) {
-                System.out.println(handler.getAppId() + " -> " + handler.getState());
+            while (true) {
+                if (handler.getState() == SparkAppHandle.State.FAILED || handler.getState() == SparkAppHandle.State.FINISHED) {
+                    System.exit(-1);
+                }
                 Thread.sleep(2000);
+                System.out.println(handler.getAppId() + " -> " + handler.getState());
             }
         } catch (IOException e) {
             e.printStackTrace();
