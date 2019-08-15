@@ -10,11 +10,13 @@ import java.util.Arrays;
  */
 public class SparkMain {
     public static void main(String[] args) {
+        System.out.println("args: " + Arrays.asList(args));
+
         SparkSession spark = SparkSession.builder()
-                .config("spark.master", "local")
+//                .config("spark.master", "local")
                 .appName("Simple Application").getOrCreate();
 
-        String logFile = SparkMain.class.getClassLoader().getResource("test.txt").getPath();
+        String logFile = args[0];
         Dataset<String> logData = spark.read().textFile(logFile).cache();
 
         Dataset<Row> flatMap = logData.flatMap((FlatMapFunction<String, String>) s ->
