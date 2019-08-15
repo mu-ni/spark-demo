@@ -3,6 +3,7 @@ package com.muni;
 import org.apache.spark.launcher.SparkAppHandle;
 import org.apache.spark.launcher.SparkLauncher;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -10,7 +11,12 @@ import java.io.IOException;
  */
 public class MyLauncher {
     public static void main(String[] args) {
+
+        // clear log
+        String errPath = MyLauncher.class.getClassLoader().getResource("spark-err.log").getPath();
+        String outputPath = MyLauncher.class.getClassLoader().getResource("spark-output.log").getPath();
         String logFile = MyLauncher.class.getClassLoader().getResource("test.txt").getPath();
+
         SparkLauncher launcher = new SparkLauncher()
                 .addSparkArg("--conf", "spark.driver.cores=1")
                 .setAppName("Test Spark")
@@ -18,6 +24,8 @@ public class MyLauncher {
                 .setSparkHome("/Users/muni/Downloads/spark-2.4.0-bin-hadoop2.7")
                 .setMainClass("com.muni.SparkMain")
                 .setAppResource("/Users/muni/IdeaProjects/spark-demo/spark-main/target/spark-main-1.0-SNAPSHOT.jar")
+                .redirectError(new File(errPath))
+                .redirectOutput(new File(outputPath))
                 .addAppArgs(logFile);
 
         try {
@@ -33,13 +41,9 @@ public class MyLauncher {
                 }
             });
 
-
-            while (true) {
-                if (handler.getState() == SparkAppHandle.State.FAILED || handler.getState() == SparkAppHandle.State.FINISHED) {
-                    System.exit(-1);
-                }
-                Thread.sleep(2000);
+            while (!handler.getState().isFinal()) {
                 System.out.println(handler.getAppId() + " -> " + handler.getState());
+                Thread.sleep(2000);
             }
         } catch (IOException e) {
             e.printStackTrace();
